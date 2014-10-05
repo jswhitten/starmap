@@ -26,7 +26,6 @@ router.get('/', function(req, res) {
 	res.send('hello world!');	
 });
 
-
 router.get('/stars', function(req,res) {
     connectionpool.getConnection(function(err, connection) {
         if (err) {
@@ -37,7 +36,7 @@ router.get('/stars', function(req,res) {
                 err:    err.code
             });
         } else {
-            connection.query('SELECT * FROM tblHYG ORDER BY StarId DESC LIMIT 20', function(err, rows, fields) {
+            connection.query('SELECT h.StarId,BayerFlam,ProperName,Spectrum,X,Y,Z FROM tblHYG h JOIN tblGalactic g ON h.StarID = g.StarId ORDER BY h.StarId DESC LIMIT 20', function(err, rows, fields) {
                 if (err) {
                     console.error(err);
                     res.statusCode = 500;
@@ -68,7 +67,7 @@ router.get('/stars/:id', function(req,res) {
                 err:    err.code
             });
         } else {
-            connection.query('SELECT * FROM tblHYG WHERE StarId = ?', req.params.id, function(err, rows, fields) {
+            connection.query('SELECT * FROM tblHYG h JOIN tblGalactic g ON h.StarID = g.StarId WHERE h.StarId = ?', req.params.id, function(err, rows, fields) {
                 if (err) {
                     console.error(err);
                     res.statusCode = 500;
