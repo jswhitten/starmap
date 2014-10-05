@@ -40,19 +40,6 @@
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" ></script>
 		<script src="js/three.min.js"></script>
 		<script src="js/starmap.js"></script>
-		<script>
-			$( "#home" ).load( "pages/home.html" );
-			$( "#about" ).load( "pages/about.html" );
-			$(".nav a").on('click',function(e) {
-				e.preventDefault(); // stops link form loading
-				$('.navbar-nav li.active').removeClass('active');
-				var $menu = $(this).parent();
-				if (!$menu.hasClass('active')) {
-					$menu.addClass('active');
-				}
-				$('.content').hide(); // hides all content divs
-				$( $(this).attr('href') ).show(); //get the href and use it find which div to show
-			});
-		</script>
+		<script src="js/nav.js"></script>
 	</body>
 </html>
