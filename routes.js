@@ -35,9 +35,9 @@ router.get('/', function(req, res) {
 });
 
 router.get('/stars', function(req,res) {
-    var sql = 'SELECT h.StarId,BayerFlam,ProperName,Spectrum,X,Y,Z FROM tblHYG h JOIN tblGalactic g ON h.StarID = g.StarId ' +
+    var sql = 'SELECT h.StarId,BayerFlam,ProperName,Spectrum,AbsMag,X,Y,Z FROM tblHYG h JOIN tblGalactic g ON h.StarID = g.StarId ' +
               'WHERE g.X > ? AND g.X < ? AND g.Y > ? AND g.Y < ? AND g.Z > ? AND g.Z < ? ' +
-              'ORDER BY h.StarId DESC LIMIT 100';
+              'ORDER BY h.StarId LIMIT 500';
     var bounds = [
         req.query.xmin ? req.query.xmin : 0,
         req.query.xmax ? req.query.xmax : 0,
