@@ -7,6 +7,14 @@ var mysql = require('mysql');
 
 nconf.env();
 nconf.file({ file: 'config.json' });
+nconf.defaults({
+    "mysql": {
+        "host"     : "localhost",
+        "user"     : "starmap",
+        "password" : "secret",
+        "database" : "starmap"
+    }
+});
 
 var connectionpool = mysql.createPool({
     host     : nconf.get('mysql:host'),

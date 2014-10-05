@@ -11,6 +11,12 @@ var nconf = require('nconf');
 nconf.env();
 nconf.file({ file: 'config.json' });
 
+nconf.defaults({
+    "http": {
+        "port": 23902
+    }
+});
+
 // all of our routes will be prefixed with /api
 app.use('/', require('./routes'));
 
