@@ -35,6 +35,17 @@ router.get('/', function(req, res) {
 });
 
 router.get('/stars', function(req,res) {
+    var sql = 'SELECT h.StarId,BayerFlam,ProperName,Spectrum,X,Y,Z FROM tblHYG h JOIN tblGalactic g ON h.StarID = g.StarId ' +
+              'WHERE g.X > ? AND g.X < ? AND g.Y > ? AND g.Y < ? AND g.Z > ? AND g.Z < ? ' +
+              'ORDER BY h.StarId DESC LIMIT 100';
+    var bounds = [
+        req.query.xmin ? req.query.xmin : 0,
+        req.query.xmax ? req.query.xmax : 0,
+        req.query.ymin ? req.query.ymin : 0,
+        req.query.ymax ? req.query.ymax : 0,
+        req.query.zmin ? req.query.zmin : 0,
+        req.query.zmax ? req.query.zmax : 0
+    ];
     connectionpool.getConnection(function(err, connection) {
         if (err) {
             console.error('CONNECTION error: ',err);
@@ -44,7 +55,7 @@ router.get('/stars', function(req,res) {
                 err:    err.code
             });
         } else {
-            connection.query('SELECT h.StarId,BayerFlam,ProperName,Spectrum,X,Y,Z FROM tblHYG h JOIN tblGalactic g ON h.StarID = g.StarId ORDER BY h.StarId DESC LIMIT 20', function(err, rows, fields) {
+            connection.query(sql, bounds, function(err, rows, fields) {
                 if (err) {
                     console.error(err);
                     res.statusCode = 500;
@@ -66,6 +77,7 @@ router.get('/stars', function(req,res) {
 });
 
 router.get('/stars/:id', function(req,res) {
+    var sql = 'SELECT * FROM tblHYG h JOIN tblGalactic g ON h.StarID = g.StarId WHERE h.StarId = ?';
     connectionpool.getConnection(function(err, connection) {
         if (err) {
             console.error('CONNECTION error: ',err);
@@ -75,7 +87,7 @@ router.get('/stars/:id', function(req,res) {
                 err:    err.code
             });
         } else {
-            connection.query('SELECT * FROM tblHYG h JOIN tblGalactic g ON h.StarID = g.StarId WHERE h.StarId = ?', req.params.id, function(err, rows, fields) {
+            connection.query(sql, req.params.id, function(err, rows, fields) {
                 if (err) {
                     console.error(err);
                     res.statusCode = 500;
