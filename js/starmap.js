@@ -3,7 +3,7 @@ var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHe
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+document.getElementById("map").appendChild( renderer.domElement );
 
 function addStar(x, y, z, m, s) {
 	var size = 0.2 - m * 0.01;

@@ -2,10 +2,57 @@
 	<head>
 		<title>StarMap</title>
 		<style>canvas { width: 100%; height: 100% }</style>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
+		<link rel="stylesheet" href="css/starmap.css">
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	</head>
 	<body>
+		<div class="navbar navbar-inverse navbar-fixed-top">
+			<div class="container">
+				<div class="navbar-header">
+					<a class="navbar-brand">StarMap</a>
+				</div>
+				<div class="navbar-collapse collapse">
+					<ul class="nav navbar-nav">
+						<li><a href="#home">Home</a></li>
+						<li><a href="#about">About</a></li>
+						<li class="active"><a href="#map">Map</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<form action="" class="navbar-form navbar-right">
+							 <div class="input-group">
+								 <input type="Search" placeholder="Search..." class="form-control" />
+								 <div class="input-group-btn">
+									 <button class="btn btn-info">
+										 <span class="glyphicon glyphicon-search"></span>
+									 </button>
+								 </div>
+							 </div>
+						</form>
+					</ul>
+				</div><!--/.nav-collapse -->
+			</div>
+		</div>
+		<div class="content textpage" id="home" style="display:none"></div>
+		<div class="content textpage" id="about" style="display:none">About</div>
+		<div class="content" id="map" align="center"></div>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" ></script>
 		<script src="js/three.min.js"></script>
 		<script src="js/starmap.js"></script>
+		<script>
+			$( "#home" ).load( "pages/home.html" );
+			$( "#about" ).load( "pages/about.html" );
+			$(".nav a").on('click',function(e) {
+				e.preventDefault(); // stops link form loading
+				$('.navbar-nav li.active').removeClass('active');
+				var $menu = $(this).parent();
+				if (!$menu.hasClass('active')) {
+					$menu.addClass('active');
+				}
+				$('.content').hide(); // hides all content divs
+				$( $(this).attr('href') ).show(); //get the href and use it find which div to show
+			});
+		</script>
 	</body>
 </html>
