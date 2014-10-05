@@ -4,6 +4,6 @@
 	"dependencies": {
 		"express": "~4.0.0",
 		"mysql": ">= 0.2.x",
-		"nconf": ""
+		"nconf": ">= 0.6.9"
 	}
 }
