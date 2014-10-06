@@ -7,7 +7,7 @@ document.getElementById("map").appendChild( renderer.domElement );
 
 function addStar(x, y, z, m, s) {
 	var size = 0.2 - m * 0.01;
-	var geometry = new THREE.SphereGeometry(size,32,32);
+	var geometry = new THREE.SphereGeometry(size);
 	var star_color = 0xffffff, halo_color = 0xaaaaaa;
 	switch(s) {
 		case "O":
@@ -59,6 +59,7 @@ function addStar(x, y, z, m, s) {
 
 $.getJSON('http://starmap.whitten.org/api/stars?xmin=-20&xmax=20&ymin=-20&ymax=20&zmin=-15&zmax=15', function (data) {
     var t = data.data;
+    var start = window.performance.now();
     for(i = 0; i < t.length; i++) {
         //console.log(JSON.stringify(t[i]));
 	x = -t[i].Y;
@@ -74,6 +75,9 @@ $.getJSON('http://starmap.whitten.org/api/stars?xmin=-20&xmax=20&ymin=-20&ymax=2
         
 	addStar(x,y,z,m,s);
     }
+    var end = window.performance.now();
+    var time = end - start;
+    console.log("Added " + i + " stars in " + time + " ms");
 });
 
 camera.position.z = 15;
