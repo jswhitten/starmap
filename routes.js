@@ -35,6 +35,7 @@ router.get('/', function(req, res) {
 });
 
 router.get('/stars', function(req,res) {
+    console.time("stars");
     var sql = 'SELECT h.StarId,BayerFlam,ProperName,Spectrum,AbsMag,X,Y,Z FROM tblHYG h JOIN tblGalactic g ON h.StarID = g.StarId ' +
               'WHERE g.X > ? AND g.X < ? AND g.Y > ? AND g.Y < ? AND g.Z > ? AND g.Z < ? ' +
               'ORDER BY h.StarId LIMIT 500';
@@ -74,9 +75,11 @@ router.get('/stars', function(req,res) {
             });
         }
     });
+    console.timeEnd("stars");
 });
 
 router.get('/stars/:id', function(req,res) {
+    console.time("stars_id");
     var sql = 'SELECT * FROM tblHYG h JOIN tblGalactic g ON h.StarID = g.StarId WHERE h.StarId = ?';
     connectionpool.getConnection(function(err, connection) {
         if (err) {
@@ -106,6 +109,7 @@ router.get('/stars/:id', function(req,res) {
             });
         }
     });
+    console.timeEnd("stars_id");
 });
 
 module.exports = router;
