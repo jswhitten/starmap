@@ -1,8 +1,13 @@
 {
-	"name": "starmap-api",
+	"name": "starmap",
 	"main": "server.js",
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/jswhitten/starmap.git"
+	},
 	"dependencies": {
 		"express": "~4.0.0",
+		"compression": ">= 1.1.0",
 		"mysql": ">= 0.2.x",
 		"nconf": ">= 0.6.9"
 	}

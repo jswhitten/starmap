@@ -1,8 +1,10 @@
 // server.js
 
 var express    = require('express'); 	// call express
+var compression = require('compression');
 var app        = express(); 		// define our app using express
 app.use(express.static(__dirname + '/public'));
+app.use(compression())
 //var bodyParser = require('body-parser');
 //app.use(bodyParser.urlencoded({ extended: true }));
 //app.use(bodyParser.json());
