@@ -1,11 +1,8 @@
-// server.js
-
 var router = require('express').Router();
-var nconf = require('nconf');
 var mysql = require('mysql');
 
+var nconf = require('nconf');
 
-nconf.env();
 nconf.file({ file: 'config.json' });
 nconf.defaults({
     "mysql": {
@@ -23,8 +20,7 @@ var connectionpool = mysql.createPool({
     database : nconf.get('mysql:database')
 });
 
-// test route to make sure everything is working (accessed at GET http://localhost:23902/api)
-// middleware to use for all requests
+// all requests
 router.use(function(req, res, next) {
 	console.log('Request received.');
 	next();

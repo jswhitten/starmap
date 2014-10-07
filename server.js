@@ -1,13 +1,9 @@
-// server.js
-
-var express    = require('express'); 	// call express
+var express     = require('express');
 var compression = require('compression');
-var app        = express(); 		// define our app using express
+var app         = express();
+
 app.use(express.static(__dirname + '/public'));
 app.use(compression())
-//var bodyParser = require('body-parser');
-//app.use(bodyParser.urlencoded({ extended: true }));
-//app.use(bodyParser.json());
 
 var nconf = require('nconf');
 
@@ -16,13 +12,11 @@ nconf.file({ file: 'config.json' });
 
 nconf.defaults({
     "http": {
-        "port": 23902
+        "port": process.env.PORT
     }
 });
 
-// all of our routes will be prefixed with /api
 app.use('/api', require('./routes'));
 
-// START THE SERVER
 app.listen(nconf.get('http:port'));
 console.log('Server listening on port ' + nconf.get('http:port'));
