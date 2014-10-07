@@ -57,7 +57,7 @@ function addStar(x, y, z, m, s) {
 	star.add(sprite); // this centers the glow at the mesh
 }
 
-$.getJSON('http://starmap.whitten.org/api/stars?xmin=-20&xmax=20&ymin=-20&ymax=20&zmin=-15&zmax=15', function (data) {
+$.getJSON('http://starmap.whitten.org/api/stars?xmin=-40&xmax=40&ymin=-40&ymax=40&zmin=-20&zmax=20', function (data) {
     var t = data.data;
     var start = window.performance.now();
     for(i = 0; i < t.length; i++) {
@@ -80,7 +80,7 @@ $.getJSON('http://starmap.whitten.org/api/stars?xmin=-20&xmax=20&ymin=-20&ymax=2
     console.log("Added " + i + " stars in " + time + " ms");
 });
 
-camera.position.z = 15;
+camera.position.z = 25;
 
 function render() {
 	requestAnimationFrame(render);
