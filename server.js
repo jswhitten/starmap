@@ -2,6 +2,7 @@
 
 var express    = require('express'); 	// call express
 var app        = express(); 		// define our app using express
+app.use(express.static(__dirname + '/public'));
 //var bodyParser = require('body-parser');
 //app.use(bodyParser.urlencoded({ extended: true }));
 //app.use(bodyParser.json());
@@ -18,7 +19,7 @@ nconf.defaults({
 });
 
 // all of our routes will be prefixed with /api
-app.use('/', require('./routes'));
+app.use('/api', require('./routes'));
 
 // START THE SERVER
 app.listen(nconf.get('http:port'));
