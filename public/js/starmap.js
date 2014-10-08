@@ -44,7 +44,7 @@ function addStar(x, y, z, m, s) {
     var geometry = new THREE.SphereGeometry(size);
     var star_color = 0xffffff, halo_color = 0xaaaaaa;
 
-    // TODO: do this better
+    // FIXME: do this better
     switch(s) {
         case "O":
             star_color = 0xaaccff;
@@ -80,6 +80,7 @@ function addStar(x, y, z, m, s) {
     var star = new THREE.Mesh( geometry, material );
 
     // place the star
+    // FIXME: this can take a long time (> 20 ms). Can I use a particle system?
     scene.add( star );
     star.position.set(x, y, z)
 
