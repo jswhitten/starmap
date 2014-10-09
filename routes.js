@@ -34,7 +34,7 @@ router.get('/stars', function(req,res) {
     console.time("stars");
     var sql = 'SELECT h.StarId,BayerFlam,ProperName,Spectrum,AbsMag,X,Y,Z FROM tblHYG h JOIN tblGalactic g ON h.StarID = g.StarId ' +
               'WHERE g.X > ? AND g.X < ? AND g.Y > ? AND g.Y < ? AND g.Z > ? AND g.Z < ? ' +
-              'ORDER BY h.StarId LIMIT 500';
+              'ORDER BY h.AbsMag DESC LIMIT 5000';
     var bounds = [
         req.query.xmin ? req.query.xmin : 0,
         req.query.xmax ? req.query.xmax : 0,

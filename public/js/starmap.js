@@ -1,41 +1,48 @@
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-camera.position.z = 25;
-
-var lastMouseX = 0;
-var lastMouseY = 0;
-var mouseDown = false;
+var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.getElementById("map").appendChild( renderer.domElement );
 
+var lastMouseX = 0;
+var lastMouseY = 0;
+var mouseDown = false;
+
 document.addEventListener( 'mousemove', onMouseMove, false );
+document.addEventListener( 'mousewheel', onMouseWheel, false );
 document.addEventListener( 'mousedown', onMouseDown, false );
 document.addEventListener( 'mouseup', onMouseUp, false );
 
+init();
+render();
+
 // load stars from web service and plot them
-$.getJSON('http://starmap.whitten.org/api/stars?xmin=-40&xmax=40&ymin=-40&ymax=40&zmin=-20&zmax=20', function (data) {
-    var t = data.data;
-    var start = window.performance.now();
-    for(i = 0; i < t.length; i++) {
-        x = -t[i].Y;
-        y = t[i].X;
-        z = t[i].Z;
-        m = t[i].AbsMag;
-        for (var s = ' ', j = 0; j < 3 && (s == ' ' || s == 'D'); j++) {
-            s = t[i].Spectrum.substring(0,1).toUpperCase();
-        }
-        if(s == ' ' && m > 8) {
-            s = 'M'; // probably a red dwarf
-        }
+function init() {
+    camera.position.z = 30;
+
+    $.getJSON('http://starmap.whitten.org/api/stars?xmin=-50&xmax=50&ymin=-100&ymax=100&zmin=-20&zmax=20', function (data) {
+        var t = data.data;
+        var start = window.performance.now();
+        for(i = 0; i < t.length; i++) {
+            x = -t[i].Y;
+            y = t[i].X;
+            z = t[i].Z;
+            m = t[i].AbsMag;
+            for (var s = ' ', j = 0; j < 3 && (s == ' ' || s == 'D'); j++) {
+                s = t[i].Spectrum.substring(0,1).toUpperCase();
+            }
+            if(0 && s == ' ' && m > 8) {
+                s = 'M'; // probably a red dwarf
+            }
         
-        addStar(x,y,z,m,s);
-    }
-    var end = window.performance.now();
-    var time = end - start;
-    console.log("Added " + i + " stars in " + time + " ms");
-});
+            addStar(x,y,z,m,s);
+        }
+        var end = window.performance.now();
+        var time = end - start;
+        console.log("Added " + i + " stars in " + time + " ms");
+    });
+}
 
 
 // place a star
@@ -74,7 +81,6 @@ function addStar(x, y, z, m, s) {
             halo_color = 0xff0000;
             break;
     }
-
     var segments = 8;
     var material = new THREE.MeshBasicMaterial( { color: star_color, side: THREE.DoubleSide } );
     var geometry = new THREE.CircleGeometry( size, segments );
@@ -85,11 +91,12 @@ function addStar(x, y, z, m, s) {
     star.position.set(x, y, z)
     
     // place the star's halo
+    // FIXME: can we do this without a sprite?
     var spriteMaterial = new THREE.SpriteMaterial( 
     { 
         map: new THREE.ImageUtils.loadTexture( 'images/glow.png' ), 
         useScreenCoordinates: false, 
-        color: halo_color, transparent: false, blending: THREE.AdditiveBlending
+        color: halo_color, transparent: true, blending: THREE.AdditiveBlending
     });
     var sprite = new THREE.Sprite( spriteMaterial );
     sprite.scale.set(size*8, size*8, size*8);
@@ -111,6 +118,12 @@ function onMouseMove(event) {
     }
 }
 
+function onMouseWheel(event) {
+    event.preventDefault();
+
+    camera.position.z -= event.wheelDeltaY * 0.05;
+}
+
 function onMouseDown(event) {
     event.preventDefault();
 
@@ -130,4 +143,3 @@ function render() {
     renderer.render(scene, camera);
 }
 
-render();
