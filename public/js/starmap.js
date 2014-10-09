@@ -11,6 +11,7 @@ var mouseDown = false;
 
 document.addEventListener( 'mousemove', onMouseMove, false );
 document.addEventListener( 'mousewheel', onMouseWheel, false );
+document.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
 document.addEventListener( 'mousedown', onMouseDown, false );
 document.addEventListener( 'mouseup', onMouseUp, false );
 
@@ -121,7 +122,9 @@ function onMouseMove(event) {
 function onMouseWheel(event) {
     event.preventDefault();
 
-    camera.position.z -= event.wheelDeltaY * 0.05;
+    var delta = event.detail ? event.detail*(-120) : event.wheelDelta
+
+    camera.position.z -= delta * 0.02;
 }
 
 function onMouseDown(event) {
