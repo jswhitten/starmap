@@ -27,7 +27,7 @@ function init() {
     $.getJSON('http://starmap.whitten.org/api/stars?xmin=-50&xmax=50&ymin=-100&ymax=100&zmin=-20&zmax=20', function (data) {
         var t = data.data;
         var start = window.performance.now();
-        for(i = 0; i < t.length; i++) {
+        for(i = 0; i < data.length; i++) {
             x = -t[i].Y;
             y = t[i].X;
             z = t[i].Z;
@@ -41,9 +41,8 @@ function init() {
             }
 
             var id = t[i].StarId;
-            var n = t[i].ProperName; 
 
-            addStar(x,y,z,m,s,n,id);
+            addStar(x,y,z,m,s,id);
         }
         var end = window.performance.now();
         var time = end - start;
@@ -55,8 +54,8 @@ function init() {
 
 
 // place a star
-function addStar(x, y, z, m, s, n, i) {
-    var size = 0.2 - m * 0.01;
+function addStar(x, y, z, m, s, i) {
+    var size = 0.35 - m * 0.025;
     var star_color = 0xffffff, halo_color = 0xaaaaaa;
 
     // FIXME: do this better
@@ -98,8 +97,7 @@ function addStar(x, y, z, m, s, n, i) {
     // place the star
     scene.add( star );
     star.position.set(x, y, z);
-    star.starid = i;
-    star.name = n;
+    star.name = i;
     objects.push( star );
     
     // place the star's halo
@@ -157,13 +155,41 @@ function onMouseDown(event) {
 
     if ( intersects.length > 0 ) {
         obj = intersects[0].object;
-        console.log("Clicked object: ", obj.starid, obj.name);
-        $("#hud_selected").text(obj.name);
-        $.getJSON('http://starmap.whitten.org/api/stars/'+obj.starid, function (data) {
+        console.log("Clicked object: ", obj.name);
+        $.getJSON('http://starmap.whitten.org/api/stars/'+obj.name, function (data) {
             var t = data.data;
+            $("#hud_selected").text(starName(t[0]));
             $("#hud_selected_data").text(JSON.stringify(t[0], null, "  "));
         });
+    } else {
+        $("#hud_selected").text("");
+        $("#hud_selected_data").text("");
     }
+}
+
+function starName(s) {
+    var n = "Unknown";
+    if(s.ProperName) {
+        n = s.ProperName;
+    } else if(s.BayerFlam) {
+        if(s.BayerFlam.substring(2, 1) == ' ') {
+            n = s.BayerFlam.substring(0, 2) + ' ' + s.BayerFlam.substring(6);
+        } else {
+            n = s.BayerFlam.substring(3);
+        }
+    } else if(s.Gliese) {
+        n = s.Gliese; 
+    } else if(s.HR > 0) {
+        n = "HR " + s.HR.toString();
+    } else if(s.HD > 0) {
+        n = "HD " + s.HD.toString();
+    } else if(s.Hip > 0) {
+        n = "Hip " + s.Hip.toString(); 
+    } else {
+        n = "HYG " + s.StarId;
+    }
+    return n;
+
 }
 
 function onMouseUp(event) {
