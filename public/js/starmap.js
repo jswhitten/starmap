@@ -34,7 +34,7 @@ function init() {
                 s = t[i].Spectrum.substring(0,1).toUpperCase();
             }
             if(0 && s == ' ' && m > 8) {
-                s = 'M'; // probably a red dwarf
+                s = 'M'; // FIXME: probably a red dwarf, but it might be a white dwarf that will make Sirius look weird
             }
         
             addStar(x,y,z,m,s);
