@@ -20,7 +20,7 @@ render();
 
 // load stars from web service and plot them
 function init() {
-    camera.position.z = 30;
+    camera.position.z = 40;
 
     $.getJSON('http://starmap.whitten.org/api/stars?xmin=-50&xmax=50&ymin=-100&ymax=100&zmin=-20&zmax=20', function (data) {
         var t = data.data;
@@ -43,6 +43,8 @@ function init() {
         var time = end - start;
         console.log("Added " + i + " stars in " + time + " ms");
     });
+
+    updateHUD();
 }
 
 
@@ -116,6 +118,8 @@ function onMouseMove(event) {
 
         camera.position.x += 0.01 * (diffMouseX);
         camera.position.y += 0.01 * (diffMouseY);
+
+        updateHUD();
     }
 }
 
@@ -125,6 +129,8 @@ function onMouseWheel(event) {
     var delta = event.detail ? event.detail*(-120) : event.wheelDelta
 
     camera.position.z -= delta * 0.01;
+
+    updateHUD();
 }
 
 function onMouseDown(event) {
@@ -139,6 +145,11 @@ function onMouseUp(event) {
     event.preventDefault();
 
     mouseDown = false;
+}
+
+function updateHUD() {
+    $("#hud_x").text(camera.position.x.toFixed(2));
+    $("#hud_y").text(camera.position.y.toFixed(2));
 }
 
 function render() {

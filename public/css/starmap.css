@@ -18,3 +18,13 @@ canvas {
 .textpage {
 	padding-top: 50px;
 }
+
+#hud {
+	position: absolute;
+	top: 80px;
+	width: 640px;
+	height: 480px;
+	margin: auto;
+	z-index: 3;
+	display: block;
+}
