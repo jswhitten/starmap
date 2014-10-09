@@ -8,6 +8,8 @@ document.getElementById("map").appendChild( renderer.domElement );
 var lastMouseX = 0;
 var lastMouseY = 0;
 var mouseDown = false;
+var projector = new THREE.Projector();
+var objects = [];
 
 document.addEventListener( 'mousemove', onMouseMove, false );
 document.addEventListener( 'mousewheel', onMouseWheel, false );
@@ -36,8 +38,11 @@ function init() {
             if(0 && s == ' ' && m > 8) {
                 s = 'M'; // FIXME: probably a red dwarf, but it might be a white dwarf that will make Sirius look weird
             }
-        
-            addStar(x,y,z,m,s);
+
+            var id = t[i].StarId;
+            var n = t[i].ProperName; 
+
+            addStar(x,y,z,m,s,n,id);
         }
         var end = window.performance.now();
         var time = end - start;
@@ -49,7 +54,7 @@ function init() {
 
 
 // place a star
-function addStar(x, y, z, m, s) {
+function addStar(x, y, z, m, s, n, i) {
     var size = 0.2 - m * 0.01;
     var star_color = 0xffffff, halo_color = 0xaaaaaa;
 
@@ -91,7 +96,10 @@ function addStar(x, y, z, m, s) {
 
     // place the star
     scene.add( star );
-    star.position.set(x, y, z)
+    star.position.set(x, y, z);
+    star.starid = i;
+    star.name = n;
+    objects.push( star );
     
     // place the star's halo
     // FIXME: can we do this without a sprite?
@@ -139,6 +147,22 @@ function onMouseDown(event) {
     mouseDown = true;
     lastMouseX = event.clientX;
     lastMouseY = event.clientY;
+
+    // select the star that was clicked on
+    var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
+    projector.unprojectVector( vector, camera );
+    var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+    var intersects = raycaster.intersectObjects( objects );
+
+    if ( intersects.length > 0 ) {
+        obj = intersects[0].object;
+        console.log("Clicked object: ", obj.starid, obj.name);
+        $("#hud_selected").text(obj.name);
+        $.getJSON('http://starmap.whitten.org/api/stars/'+obj.starid, function (data) {
+            var t = data.data;
+            $("#hud_selected_data").text(JSON.stringify(t[0], null, "  "));
+        });
+    }
 }
 
 function onMouseUp(event) {
