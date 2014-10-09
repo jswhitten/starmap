@@ -82,7 +82,7 @@ function addStar(x, y, z, m, s) {
             halo_color = 0xff0000;
             break;
     }
-    var segments = 8;
+    var segments = 32;
     var material = new THREE.MeshBasicMaterial( { color: star_color, side: THREE.DoubleSide } );
     var geometry = new THREE.CircleGeometry( size, segments );
     var star = new THREE.Mesh( geometry, material );
