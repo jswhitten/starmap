@@ -41,7 +41,6 @@ $.getJSON('http://starmap.whitten.org/api/stars?xmin=-40&xmax=40&ymin=-40&ymax=4
 // place a star
 function addStar(x, y, z, m, s) {
     var size = 0.2 - m * 0.01;
-    var geometry = new THREE.SphereGeometry(size);
     var star_color = 0xffffff, halo_color = 0xaaaaaa;
 
     // FIXME: do this better
@@ -76,14 +75,15 @@ function addStar(x, y, z, m, s) {
             break;
     }
 
-    var material = new THREE.MeshBasicMaterial( { color: star_color } );
+    var segments = 8;
+    var material = new THREE.MeshBasicMaterial( { color: star_color, side: THREE.DoubleSide } );
+    var geometry = new THREE.CircleGeometry( size, segments );
     var star = new THREE.Mesh( geometry, material );
 
     // place the star
-    // FIXME: this can take a long time (> 20 ms). Can I use a particle system?
     scene.add( star );
     star.position.set(x, y, z)
-
+    
     // place the star's halo
     var spriteMaterial = new THREE.SpriteMaterial( 
     { 
@@ -92,7 +92,7 @@ function addStar(x, y, z, m, s) {
         color: halo_color, transparent: false, blending: THREE.AdditiveBlending
     });
     var sprite = new THREE.Sprite( spriteMaterial );
-    sprite.scale.set(size*15, size*15, size*15);
+    sprite.scale.set(size*8, size*8, size*8);
     star.add(sprite);
 }
 
