@@ -32,10 +32,11 @@ function init() {
             y = t[i].X;
             z = t[i].Z;
             m = t[i].AbsMag;
-            for (var s = ' ', j = 0; j < 3 && (s == ' ' || s == 'D'); j++) {
-                s = t[i].Spectrum.substring(0,1).toUpperCase();
+            var spec = t[i].Spectrum.trim();
+            for (var s = '', j = 0; j < 4 && (s == '' || s == 'D'); j++) {
+                s = spec.substring(j,1).toUpperCase();
             }
-            if(0 && s == ' ' && m > 8) {
+            if(0 && s == '' && m > 8) {
                 s = 'M'; // FIXME: probably a red dwarf, but it might be a white dwarf that will make Sirius look weird
             }
 
