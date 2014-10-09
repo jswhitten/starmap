@@ -124,7 +124,7 @@ function onMouseWheel(event) {
 
     var delta = event.detail ? event.detail*(-120) : event.wheelDelta
 
-    camera.position.z -= delta * 0.02;
+    camera.position.z -= delta * 0.01;
 }
 
 function onMouseDown(event) {
