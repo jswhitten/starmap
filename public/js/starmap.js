@@ -12,7 +12,8 @@ var lastMouseDown = 0;
 var projector = new THREE.Projector();
 var objects = [];
 var target = null;
-var goToStar = null;
+var goToTarget = false;
+var homeStar = null;
 
 document.addEventListener( 'mousemove', onMouseMove, false );
 document.addEventListener( 'mousewheel', onMouseWheel, false );
@@ -118,6 +119,11 @@ function addStar(x, y, z, m, s, i) {
     star.position.set(x, y, z);
     star.name = i;
     objects.push( star );
+
+    // set home
+    if(i == 0) {
+        homeStar = star;
+    }
     
     // place the star's halo
     // FIXME: can we do this without a sprite?
@@ -213,12 +219,7 @@ function onMouseUp(event) {
 
         if ( intersects.length > 0 ) {
             obj = intersects[0].object;
-            console.log("Clicked object: ", obj.name);
-            $.getJSON('http://starmap.whitten.org/api/stars/'+obj.name, function (data) {
-                var t = data.data;
-                star = t[0];
-                updateHUD(star);
-            });
+            selectStar(obj);
         } else {
             updateHUD();
             $("#hud_selected").text("");
@@ -229,6 +230,14 @@ function onMouseUp(event) {
     }
 }
 
+function selectStar(o) {
+    console.log("Clicked object: ", o.name);
+    $.getJSON('http://starmap.whitten.org/api/stars/'+o.name, function (data) {
+        var t = data.data;
+        star = t[0];
+        updateHUD(star);
+    });
+}
 
 function onKeyDown(event) {
     var keyCode = event.which;
@@ -236,8 +245,14 @@ function onKeyDown(event) {
     // C
     if(keyCode == 67) {
         if(target.obj) {
-            goToStar = target.obj;
+            goToTarget = true;
         }
+    }
+
+    // H
+    if(keyCode == 72) {
+        selectStar(homeStar);
+        goToTarget = true;
     }
 }
 
@@ -259,23 +274,25 @@ function updateHUD(star) {
         star_info += "</table>";
         $("#hud_selected").text(n[0]);
         $("#hud_selected_data").html(star_info);
-        target.obj = obj;
-        target.position.x = obj.position.x;
-        target.position.y = obj.position.y;
-        target.position.z = obj.position.z;
+
+        // FIXME - use the mesh object instead?
+        target.obj = star;
+        target.position.x = -star.Y;
+        target.position.y = star.X;
+        target.position.z = star.Z;
         target.visible = true;
     }
 }
 
 function animate() {
-    if(goToStar) {
-        var a = new THREE.Vector2( goToStar.position.x, goToStar.position.y);
+    if(goToTarget) {
+        var a = new THREE.Vector2( target.position.x, target.position.y);
         var b = new THREE.Vector2( camera.position.x, camera.position.y);
         var c = a.sub(b);
         if(c.length() < 1) {
-            camera.position.x = goToStar.position.x;
-            camera.position.y = goToStar.position.y;
-            goToStar = null;
+            camera.position.x = target.position.x;
+            camera.position.y = target.position.y;
+            goToTarget = false;
         } else {
             c = c.normalize();
             var axis = new THREE.Vector3(c.x, c.y, 0);
