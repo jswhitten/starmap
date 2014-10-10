@@ -16,15 +16,15 @@
                 </div>
                 <div class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#about">About</a></li>
+                        <li><a href="#search">Search</a></li>
                         <li class="active"><a href="#map">Map</a></li>
+                        <li><a href="#settings">Settings</a></li>
+                        <li><a href="#about">About</a></li>
                     </ul>
                 </div><!--/.nav-collapse -->
             </div>
         </div>
-        <div class="content textpage" id="home" style="display:none"></div>
-        <div class="content textpage" id="about" style="display:none">About</div>
+        <div class="content textpage" id="search" style="display:none"></div>
         <div class="content" id="map">
             <div id="hud">
                 <!-- Center: (<span id="hud_x"></span>, <span id="hud_y"></span>)<br /> -->
@@ -32,6 +32,9 @@
                 <span id="hud_selected_data"></span>
             </div>
         </div>
+        <div class="content textpage" id="settings" style="display:none"></div>
+        <div class="content textpage" id="about" style="display:none"></div>
+
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" ></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/three.js/r68/three.min.js"></script>

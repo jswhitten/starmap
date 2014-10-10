@@ -1,5 +1,6 @@
-$( "#home" ).load( "pages/home.html" );
+$( "#search" ).load( "pages/search.html" );
 $( "#about" ).load( "pages/about.html" );
+$( "#settings" ).load( "pages/settings.html" );
 
 $(".nav a").on('click', function(e) {
     e.preventDefault();

@@ -28,7 +28,7 @@ render();
 function init() {
     camera.position.z = 40;
 
-    $.getJSON('http://starmap.whitten.org/api/stars?xmin=-50&xmax=50&ymin=-100&ymax=100&zmin=-20&zmax=20', function (data) {
+    $.getJSON('http://starmap.whitten.org/api/stars?xmin=-40&xmax=40&ymin=-60&ymax=60&zmin=-20&zmax=20', function (data) {
         var t = data.data;
         var start = window.performance.now();
         for(var i = 0; i < data.length; i++) {
