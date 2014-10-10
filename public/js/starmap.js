@@ -8,6 +8,7 @@ document.getElementById("map").appendChild( renderer.domElement );
 var lastMouseX = 0;
 var lastMouseY = 0;
 var mouseDown = false;
+var lastMouseDown = 0;
 var projector = new THREE.Projector();
 var objects = [];
 
@@ -27,11 +28,11 @@ function init() {
     $.getJSON('http://starmap.whitten.org/api/stars?xmin=-50&xmax=50&ymin=-100&ymax=100&zmin=-20&zmax=20', function (data) {
         var t = data.data;
         var start = window.performance.now();
-        for(i = 0; i < data.length; i++) {
-            x = -t[i].Y;
-            y = t[i].X;
-            z = t[i].Z;
-            m = t[i].AbsMag;
+        for(var i = 0; i < data.length; i++) {
+            var x = -t[i].Y;
+            var y = t[i].X;
+            var z = t[i].Z;
+            var m = t[i].AbsMag;
             var spec = t[i].Spectrum.trim();
             for (var s = '', j = 0; j < 4 && (s == '' || s == 'D'); j++) {
                 s = spec.substring(j,1).toUpperCase();
@@ -113,6 +114,31 @@ function addStar(x, y, z, m, s, i) {
     star.add(sprite);
 }
 
+function starName(s) {
+    var n = "Unknown";
+    if(s.ProperName) {
+        n = s.ProperName;
+    } else if(s.BayerFlam) {
+        if(s.BayerFlam.substring(2, 1) == ' ') {
+            n = s.BayerFlam.substring(0, 2) + ' ' + s.BayerFlam.substring(6);
+        } else {
+            n = s.BayerFlam.substring(3);
+        }
+    } else if(s.Gliese) {
+        n = s.Gliese; 
+    } else if(s.HR > 0) {
+        n = "HR " + s.HR.toString();
+    } else if(s.HD > 0) {
+        n = "HD " + s.HD.toString();
+    } else if(s.Hip > 0) {
+        n = "Hip " + s.Hip.toString(); 
+    } else {
+        n = "HYG " + s.StarId;
+    }
+    return n;
+
+}
+
 function onMouseMove(event) {
     event.preventDefault();
 
@@ -146,56 +172,35 @@ function onMouseDown(event) {
     mouseDown = true;
     lastMouseX = event.clientX;
     lastMouseY = event.clientY;
-
-    // select the star that was clicked on
-    var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
-    projector.unprojectVector( vector, camera );
-    var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
-    var intersects = raycaster.intersectObjects( objects );
-
-    if ( intersects.length > 0 ) {
-        obj = intersects[0].object;
-        console.log("Clicked object: ", obj.name);
-        $.getJSON('http://starmap.whitten.org/api/stars/'+obj.name, function (data) {
-            var t = data.data;
-            $("#hud_selected").text(starName(t[0]));
-            $("#hud_selected_data").text(JSON.stringify(t[0], null, "  "));
-        });
-    } else {
-        $("#hud_selected").text("");
-        $("#hud_selected_data").text("");
-    }
+    lastMouseDown = window.performance.now();
 }
 
-function starName(s) {
-    var n = "Unknown";
-    if(s.ProperName) {
-        n = s.ProperName;
-    } else if(s.BayerFlam) {
-        if(s.BayerFlam.substring(2, 1) == ' ') {
-            n = s.BayerFlam.substring(0, 2) + ' ' + s.BayerFlam.substring(6);
-        } else {
-            n = s.BayerFlam.substring(3);
-        }
-    } else if(s.Gliese) {
-        n = s.Gliese; 
-    } else if(s.HR > 0) {
-        n = "HR " + s.HR.toString();
-    } else if(s.HD > 0) {
-        n = "HD " + s.HD.toString();
-    } else if(s.Hip > 0) {
-        n = "Hip " + s.Hip.toString(); 
-    } else {
-        n = "HYG " + s.StarId;
-    }
-    return n;
-
-}
 
 function onMouseUp(event) {
     event.preventDefault();
 
     mouseDown = false;
+
+    if(window.performance.now() - lastMouseDown < 500) {
+        // select the star that was clicked on
+        var vector = new THREE.Vector3( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1, 0.5 );
+        projector.unprojectVector( vector, camera );
+        var raycaster = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
+        var intersects = raycaster.intersectObjects( objects );
+
+        if ( intersects.length > 0 ) {
+            obj = intersects[0].object;
+            console.log("Clicked object: ", obj.name);
+            $.getJSON('http://starmap.whitten.org/api/stars/'+obj.name, function (data) {
+                var t = data.data;
+                $("#hud_selected").text(starName(t[0]));
+                $("#hud_selected_data").text(JSON.stringify(t[0], null, "  "));
+            });
+        } else {
+            $("#hud_selected").text("");
+            $("#hud_selected_data").text("");
+        }
+    }
 }
 
 function updateHUD() {
