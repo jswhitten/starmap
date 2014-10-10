@@ -11,23 +11,15 @@ var mouseDown = false;
 var lastMouseDown = 0;
 var projector = new THREE.Projector();
 var objects = [];
-
-var target_material = new THREE.LineBasicMaterial( { color: 0xaaddff } );
-var target_geometry = new THREE.CircleGeometry( 2, 32 );
-target_geometry.vertices.shift();
-var target = new THREE.Line( target_geometry, target_material );
-target.visible = false;
-scene.add( target );
-
+var target = null;
 var goToStar = null;
-
 
 document.addEventListener( 'mousemove', onMouseMove, false );
 document.addEventListener( 'mousewheel', onMouseWheel, false );
 document.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
 document.addEventListener( 'mousedown', onMouseDown, false );
 document.addEventListener( 'mouseup', onMouseUp, false );
-document.addEventListener("keydown", onDocumentKeyDown, false);
+document.addEventListener( 'keydown', onKeyDown, false);
 
 init();
 render();
@@ -61,6 +53,12 @@ function init() {
         console.log("Added " + i + " stars in " + time + " ms");
     });
 
+    var target_material = new THREE.LineBasicMaterial( { color: 0xaaddff } );
+    var target_geometry = new THREE.CircleGeometry( 2, 32 );
+    target_geometry.vertices.shift();
+    target = new THREE.Line( target_geometry, target_material );
+    target.visible = false;
+    scene.add( target );
 
     updateHUD();
 }
@@ -210,25 +208,11 @@ function onMouseUp(event) {
             console.log("Clicked object: ", obj.name);
             $.getJSON('http://starmap.whitten.org/api/stars/'+obj.name, function (data) {
                 var t = data.data;
-                var n = starName(t[0]);
-                var star_info = "<table class='table table-condensed'>";
-                star_info += "<tr><td>Identifiers</td><td>" + n.join(", ") + "</td></tr>";
-                star_info += "<tr><td>Spectral type</td><td>" + t[0].Spectrum + "</td></tr>";
-                star_info += "<tr><td>Sky coordinates</td><td>" + t[0].RA + " hr / " + t[0].Declination + " deg</td></tr>";
-                star_info += "<tr><td>Galactic coordinates</td><td>" + t[0].X + " / " + t[0].Y + " / " + t[0].Z + "</td></tr>";
-                star_info += "<tr><td>Distance</td><td>" + t[0].Distance + " pc</td></tr>";
-                star_info += "<tr><td>Apparent magnitude</td><td>" + t[0].Mag + "</td></tr>";
-                star_info += "<tr><td>Absolute magnitude</td><td>" + t[0].AbsMag + "</td></tr>";
-                star_info += "</table>";
-                $("#hud_selected").text(n[0]);
-                $("#hud_selected_data").html(star_info);
-                target.obj = obj;
-                target.position.x = obj.position.x;
-                target.position.y = obj.position.y;
-                target.position.z = obj.position.z;
-                target.visible = true;
+                star = t[0];
+                updateHUD(star);
             });
         } else {
+            updateHUD();
             $("#hud_selected").text("");
             $("#hud_selected_data").text("");
             target.visible = false;
@@ -237,40 +221,63 @@ function onMouseUp(event) {
     }
 }
 
-function updateHUD() {
-    $("#hud_x").text(camera.position.x.toFixed(2));
-    $("#hud_y").text(camera.position.y.toFixed(2));
-}
 
-function onDocumentKeyDown(event) {
+function onKeyDown(event) {
     var keyCode = event.which;
 
+    // C
     if(keyCode = 67) {
-        console.log("C pressed");
         if(target.obj) {
             goToStar = target.obj;
         }
     }
 }
 
-function render() {
-if(goToStar) {
-    var a = new THREE.Vector2( goToStar.position.x, goToStar.position.y);
-    var b = new THREE.Vector2( camera.position.x, camera.position.y);
-    var c = a.sub(b);
-    if(c.length() < 1) {
-        camera.position.x = goToStar.position.x;
-        camera.position.y = goToStar.position.y;
-        goToStar = null;
-    } else {
-        //console.log(c.length().toString());
-        c = c.normalize();
-        var axis = new THREE.Vector3(c.x, c.y, 0);
-        camera.translateOnAxis(axis, 1);
-        //console.log("camera.translateOnAxis(" + axis.x + ", " + axis.y + ")");
+function updateHUD(star) {
+    $("#hud_x").text(camera.position.x.toFixed(2));
+    $("#hud_y").text(camera.position.y.toFixed(2));
+
+    // FIXME
+    if(star) {
+        var n = starName(star);
+        var star_info = "<table class='table table-condensed'>";
+        star_info += "<tr><td>Identifiers</td><td>" + n.join(", ") + "</td></tr>";
+        star_info += "<tr><td>Spectral type</td><td>" + star.Spectrum + "</td></tr>";
+        star_info += "<tr><td>Sky coordinates</td><td>" + star.RA + " hr / " + star.Declination + " deg</td></tr>";
+        star_info += "<tr><td>Galactic coordinates</td><td>" + star.X + " / " + star.Y + " / " + star.Z + "</td></tr>";
+        star_info += "<tr><td>Distance</td><td>" + star.Distance + " pc</td></tr>";
+        star_info += "<tr><td>Apparent magnitude</td><td>" + star.Mag + "</td></tr>";
+        star_info += "<tr><td>Absolute magnitude</td><td>" + star.AbsMag + "</td></tr>";
+        star_info += "</table>";
+        $("#hud_selected").text(n[0]);
+        $("#hud_selected_data").html(star_info);
+        target.obj = obj;
+        target.position.x = obj.position.x;
+        target.position.y = obj.position.y;
+        target.position.z = obj.position.z;
+        target.visible = true;
     }
 }
 
+function animate() {
+    if(goToStar) {
+        var a = new THREE.Vector2( goToStar.position.x, goToStar.position.y);
+        var b = new THREE.Vector2( camera.position.x, camera.position.y);
+        var c = a.sub(b);
+        if(c.length() < 1) {
+            camera.position.x = goToStar.position.x;
+            camera.position.y = goToStar.position.y;
+            goToStar = null;
+        } else {
+            c = c.normalize();
+            var axis = new THREE.Vector3(c.x, c.y, 0);
+            camera.translateOnAxis(axis, 1);
+        }
+    }
+}
+
+function render() {
+    animate();
     requestAnimationFrame(render);
     renderer.render(scene, camera);
 }
