@@ -12,11 +12,22 @@ var lastMouseDown = 0;
 var projector = new THREE.Projector();
 var objects = [];
 
+var target_material = new THREE.LineBasicMaterial( { color: 0xaaddff } );
+var target_geometry = new THREE.CircleGeometry( 2, 32 );
+target_geometry.vertices.shift();
+var target = new THREE.Line( target_geometry, target_material );
+target.visible = false;
+scene.add( target );
+
+var goToStar = null;
+
+
 document.addEventListener( 'mousemove', onMouseMove, false );
 document.addEventListener( 'mousewheel', onMouseWheel, false );
 document.addEventListener( 'DOMMouseScroll', onMouseWheel, false ); // firefox
 document.addEventListener( 'mousedown', onMouseDown, false );
 document.addEventListener( 'mouseup', onMouseUp, false );
+document.addEventListener("keydown", onDocumentKeyDown, false);
 
 init();
 render();
@@ -49,6 +60,7 @@ function init() {
         var time = end - start;
         console.log("Added " + i + " stars in " + time + " ms");
     });
+
 
     updateHUD();
 }
@@ -115,26 +127,31 @@ function addStar(x, y, z, m, s, i) {
 }
 
 function starName(s) {
-    var n = "Unknown";
+    var n = new Array();
     if(s.ProperName) {
-        n = s.ProperName;
-    } else if(s.BayerFlam) {
+        n.push(s.ProperName);
+    } 
+    if(s.BayerFlam) {
         if(s.BayerFlam.substring(2, 1) == ' ') {
-            n = s.BayerFlam.substring(0, 2) + ' ' + s.BayerFlam.substring(6);
+            n.push(s.BayerFlam.substring(0, 2) + ' ' + s.BayerFlam.substring(6));
         } else {
-            n = s.BayerFlam.substring(3);
+            n.push(s.BayerFlam.substring(3));
         }
-    } else if(s.Gliese) {
-        n = s.Gliese; 
-    } else if(s.HR > 0) {
-        n = "HR " + s.HR.toString();
-    } else if(s.HD > 0) {
-        n = "HD " + s.HD.toString();
-    } else if(s.Hip > 0) {
-        n = "Hip " + s.Hip.toString(); 
-    } else {
-        n = "HYG " + s.StarId;
+    } 
+    if(s.Gliese) {
+        n.push(s.Gliese); 
+    } 
+    if(s.HR > 0) {
+        n.push("HR " + s.HR.toString());
+    } 
+    if(s.HD > 0) {
+        n.push("HD " + s.HD.toString());
+    } 
+    if(s.Hip > 0) {
+        n.push("Hip " + s.Hip.toString()); 
     }
+    n.push("HYG " + s.StarID.toString());
+
     return n;
 
 }
@@ -193,12 +210,29 @@ function onMouseUp(event) {
             console.log("Clicked object: ", obj.name);
             $.getJSON('http://starmap.whitten.org/api/stars/'+obj.name, function (data) {
                 var t = data.data;
-                $("#hud_selected").text(starName(t[0]));
-                $("#hud_selected_data").text(JSON.stringify(t[0], null, "  "));
+                var n = starName(t[0]);
+                var star_info = "<table class='table table-condensed'>";
+                star_info += "<tr><td>Identifiers</td><td>" + n.join(", ") + "</td></tr>";
+                star_info += "<tr><td>Spectral type</td><td>" + t[0].Spectrum + "</td></tr>";
+                star_info += "<tr><td>Sky coordinates</td><td>" + t[0].RA + " hr / " + t[0].Declination + " deg</td></tr>";
+                star_info += "<tr><td>Galactic coordinates</td><td>" + t[0].X + " / " + t[0].Y + " / " + t[0].Z + "</td></tr>";
+                star_info += "<tr><td>Distance</td><td>" + t[0].Distance + " pc</td></tr>";
+                star_info += "<tr><td>Apparent magnitude</td><td>" + t[0].Mag + "</td></tr>";
+                star_info += "<tr><td>Absolute magnitude</td><td>" + t[0].AbsMag + "</td></tr>";
+                star_info += "</table>";
+                $("#hud_selected").text(n[0]);
+                $("#hud_selected_data").html(star_info);
+                target.obj = obj;
+                target.position.x = obj.position.x;
+                target.position.y = obj.position.y;
+                target.position.z = obj.position.z;
+                target.visible = true;
             });
         } else {
             $("#hud_selected").text("");
             $("#hud_selected_data").text("");
+            target.visible = false;
+            target.obj = null;
         }
     }
 }
@@ -208,7 +242,35 @@ function updateHUD() {
     $("#hud_y").text(camera.position.y.toFixed(2));
 }
 
+function onDocumentKeyDown(event) {
+    var keyCode = event.which;
+
+    if(keyCode = 67) {
+        console.log("C pressed");
+        if(target.obj) {
+            goToStar = target.obj;
+        }
+    }
+}
+
 function render() {
+if(goToStar) {
+    var a = new THREE.Vector2( goToStar.position.x, goToStar.position.y);
+    var b = new THREE.Vector2( camera.position.x, camera.position.y);
+    var c = a.sub(b);
+    if(c.length() < 1) {
+        camera.position.x = goToStar.position.x;
+        camera.position.y = goToStar.position.y;
+        goToStar = null;
+    } else {
+        //console.log(c.length().toString());
+        c = c.normalize();
+        var axis = new THREE.Vector3(c.x, c.y, 0);
+        camera.translateOnAxis(axis, 1);
+        //console.log("camera.translateOnAxis(" + axis.x + ", " + axis.y + ")");
+    }
+}
+
     requestAnimationFrame(render);
     renderer.render(scene, camera);
 }
