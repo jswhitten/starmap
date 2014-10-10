@@ -53,12 +53,20 @@ function init() {
         console.log("Added " + i + " stars in " + time + " ms");
     });
 
-    var target_material = new THREE.LineBasicMaterial( { color: 0xaaddff } );
-    var target_geometry = new THREE.CircleGeometry( 2, 32 );
+//var material = new THREE.MeshBasicMaterial( {color: 0x00ff00} );
+//var cube = new THREE.Mesh( geometry, material );
+//scene.add( cube );
+
+    var target_material = new THREE.LineBasicMaterial( { color: 0x009999 } );
+    var target_geometry = new THREE.CircleGeometry( 2, 16, 0, Math.PI/2 );
+    var target_geometry_2 = new THREE.CircleGeometry( 2, 16, Math.PI, Math.PI/2 );
     target_geometry.vertices.shift();
+    target_geometry_2.vertices.shift();
     target = new THREE.Line( target_geometry, target_material );
+    target_2 = new THREE.Line( target_geometry_2, target_material );
     target.visible = false;
     scene.add( target );
+    target.add( target_2 );
 
     updateHUD();
 }
@@ -226,7 +234,7 @@ function onKeyDown(event) {
     var keyCode = event.which;
 
     // C
-    if(keyCode = 67) {
+    if(keyCode == 67) {
         if(target.obj) {
             goToStar = target.obj;
         }
@@ -273,6 +281,10 @@ function animate() {
             var axis = new THREE.Vector3(c.x, c.y, 0);
             camera.translateOnAxis(axis, 1);
         }
+    }
+    if(target.obj) {
+        var t = window.performance.now() % 4000;
+        target.rotation.z = t * Math.PI / 2000;
     }
 }
 
