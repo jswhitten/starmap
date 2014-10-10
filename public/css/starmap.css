@@ -36,3 +36,7 @@ canvas {
 #hud_selected_data {
 	color: #999999;
 }
+
+#hud_selected_data td {
+	border-color: #330000;
+}
