@@ -86,26 +86,26 @@ function addStar(x, y, z, m, s, i) {
             break;
         case "B":
             star_color = 0xccccff;
-            halo_color = 0x0000ff;
+            halo_color = 0x3333ff;
             break;
         case "A":
             star_color = 0xffffff;
-            halo_color = 0xffffff;
+            halo_color = 0xccccff;
             break;
         case "F":
             star_color = 0xffffff;
-            halo_color = 0xffffcc;
+            halo_color = 0xffffaa;
             break;
         case "G":
             star_color = 0xffffcc;
-            halo_color = 0xe6e61a;
+            halo_color = 0xffff66;
             break;
         case "K":
-            star_color = 0xffffcc;
-            halo_color = 0xe6941a;
+            star_color = 0xffaa99;
+            halo_color = 0xff9900;
             break;
         case "M":
-            star_color = 0xffddcc;
+            star_color = 0xffaa33;
             halo_color = 0xff0000;
             break;
     }
