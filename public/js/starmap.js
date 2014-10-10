@@ -38,7 +38,7 @@ function init() {
             var m = t[i].AbsMag;
             var spec = t[i].Spectrum.trim();
             for (var s = '', j = 0; j < 4 && (s == '' || s == 'D'); j++) {
-                s = spec.substring(j,1).toUpperCase();
+                s = spec.substring(j,j+1).toUpperCase();
             }
             if(0 && s == '' && m > 8) {
                 s = 'M'; // FIXME: probably a red dwarf, but it might be a white dwarf that will make Sirius look weird
@@ -130,8 +130,8 @@ function starName(s) {
         n.push(s.ProperName);
     } 
     if(s.BayerFlam) {
-        if(s.BayerFlam.substring(2, 1) == ' ') {
-            n.push(s.BayerFlam.substring(0, 2) + ' ' + s.BayerFlam.substring(6));
+        if(s.BayerFlam.substring(3, 4) === " ") {
+            n.push(s.BayerFlam.substring(0, 3) + ' ' + s.BayerFlam.substring(6));
         } else {
             n.push(s.BayerFlam.substring(3));
         }
